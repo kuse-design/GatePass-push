@@ -2,7 +2,7 @@ package data.repositories;
 import data.models.Resident;
 import java.util.List;
 
-public interface ResidentRepo {
+public interface ResidentRepository {
     List<Resident> findAll();
     Resident findById(String id);
 

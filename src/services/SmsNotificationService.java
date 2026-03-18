@@ -1,4 +1,4 @@
 package services;
 
-public class SmsNotificationService {
+public class SmsNotificationService implements NotificationService{
 }

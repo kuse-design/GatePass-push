@@ -1,4 +1,7 @@
 package exceptions;
 
-public class ResidentDoesNotExistException {
+public class ResidentDoesNotExistException extends RuntimeException{
+    public ResidentDoesNotExistException(String message){
+        super(message);
+    }
 }

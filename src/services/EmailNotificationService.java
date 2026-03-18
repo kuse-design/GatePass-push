@@ -1,4 +1,8 @@
 package services;
 
-public class EmailNotificationService {
-}
+public class EmailNotificationService implements NotificationService{
+
+
+
+    }
+
