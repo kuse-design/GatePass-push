@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GatePass.iml" filepath="$PROJECT_DIR$/GatePass.iml" />
+      <module fileurl="file://$PROJECT_DIR$/estateManagementSystem.iml" filepath="$PROJECT_DIR$/estateManagementSystem.iml" />
     </modules>
   </component>
 </project>

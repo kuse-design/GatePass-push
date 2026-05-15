@@ -10,4 +10,5 @@ public interface ResidentRepository extends MongoRepository<Resident, String> {
     Resident findByPhoneNumber(String phoneNumber);
 
 
+
 }

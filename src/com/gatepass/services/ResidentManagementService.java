@@ -9,7 +9,6 @@ import com.gatepass.exceptions.ResidentDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.gatepass.utils.Mapper;
-
 import java.util.List;
 
 @Service

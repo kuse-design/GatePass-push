@@ -11,21 +11,6 @@ public class GenerateResidentEntryCodeRequest {
     private LocalTime validTill;
     private String phoneNumber;
 
-//    public String getResidentId() {
-//        return residentId;
-//    }
-//
-//    public void setResidentId(String residentId) {
-//        this.residentId = residentId;
-//    }
-//
-//    public LocalTime getValidTill() {
-//        return validTill;
-//    }
-//
-//    public void setValidTill(LocalTime validTill) {
-//        this.validTill = validTill;
-//    }
 
 
 

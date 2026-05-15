@@ -5,7 +5,6 @@ import com.gatepass.data.models.Resident;
 import com.gatepass.data.models.Types;
 import com.gatepass.dtos.request.*;
 import com.gatepass.dtos.responses.*;
-
 import java.time.LocalDateTime;
 
 public class Mapper {
@@ -35,7 +34,7 @@ public class Mapper {
     public static GatePass map(GenerateResidentEntryCodeRequest request) {
         GatePass gatePass = new GatePass();
 
-        gatePass.setResidentId(Integer.parseInt(request.getResidentId())); // ⚠️ convert String → int
+        gatePass.setResidentId(Integer.parseInt(request.getResidentId()));
         gatePass.setPassType(Types.ENTRY);
         gatePass.setExpiresAt(request.getValidTill().atDate(LocalDateTime.now().toLocalDate()));
 
@@ -46,7 +45,7 @@ public class Mapper {
         GenerateResidentEntryCodeResponse response = new GenerateResidentEntryCodeResponse();
 
         response.setCode(gatePass.getCode());
-        response.setResidentName(resident.getName());
+        response.setResidentName(resident.getPhoneNumber());
         response.setCodeType(Types.ENTRY.name());
         response.setValidTill(gatePass.getExpiresAt().toString());
 

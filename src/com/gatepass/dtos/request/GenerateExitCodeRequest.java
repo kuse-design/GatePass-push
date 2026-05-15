@@ -11,11 +11,5 @@ public class GenerateExitCodeRequest {
     private String code;
     private LocalDateTime validTill;
 
-//    public String getCode() {
-//        return code;
-//    }
-//
-//    public void setCode(String code) {
-//        this.code = code;
-//    }
+
 }
