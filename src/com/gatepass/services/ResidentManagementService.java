@@ -10,7 +10,6 @@ import com.gatepass.exceptions.ResidentDoesNotExistException;
 import com.gatepass.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -20,8 +19,14 @@ public class ResidentManagementService {
     private ResidentRepository residentRepository;
 
     public OnboardResidentResponse onboardResident(OnboardResidentRequest request) {
-        Resident existingResident = residentRepository.findByPhoneNumber(request.getPhoneNumber());
-        validateNoDuplicate(existingResident);
+
+        Resident existingByPhone = residentRepository.findByPhoneNumber(request.getPhoneNumber());
+        if (existingByPhone != null)
+            throw new ResidentAlreadyRegisteredException("A resident with this phone number already exists");
+
+        Resident existingByEmail = residentRepository.findByEmail(request.getEmail());
+        if (existingByEmail != null)
+            throw new ResidentAlreadyRegisteredException("A resident with this email already exists");
 
         Resident resident = Mapper.map(request);
         residentRepository.save(resident);
@@ -48,15 +53,10 @@ public class ResidentManagementService {
 
         if (resident == null)
             throw new ResidentDoesNotExistException("Resident unavailable");
+
         resident.setEnabled(false);
         residentRepository.save(resident);
 
         return resident.getName() + " disabled";
-    }
-
-    private void validateNoDuplicate(Resident resident) {
-        if (resident != null) {
-            throw new ResidentAlreadyRegisteredException("User already exists");
-        }
     }
 }

@@ -23,7 +23,6 @@ public class GateAccessService {
 
     @Autowired
     private ResidentRepository residentRepository;
-
     @Autowired
     private GatePassRepository gatePassRepository;
     @Autowired
@@ -96,13 +95,10 @@ public class GateAccessService {
 
     public String disableCode(String code) {
         GatePass gatePass = gatePassRepository.findByCode(code);
-
         if (gatePass == null) {
             throw new InvalidGatePassException("Code not found");
 
         }
-
-
         gatePass.setActive(false);
         gatePassRepository.save(gatePass);
 

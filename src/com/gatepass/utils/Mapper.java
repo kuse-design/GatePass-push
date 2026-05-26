@@ -26,29 +26,26 @@ public class Mapper {
         response.setResidentName(resident.getName());
         response.setPhoneNumber(resident.getPhoneNumber());
         response.setHouseAddress(resident.getHouseAddress());
+        response.setDateRegistered(
+                resident.getDateRegistered() != null
+                        ? resident.getDateRegistered().toString()
+                        : null
+        );
         return response;
     }
 
     public static GatePass map(GenerateResidentEntryCodeRequest request) {
         GatePass gatePass = new GatePass();
-
         gatePass.setResidentId(request.getResidentId());
-
         gatePass.setPassType(Types.RESIDENT_ENTRY);
-
-
         gatePass.setExpiresAt(LocalDateTime.from(request.getValidTill()));
-
         return gatePass;
     }
 
     public static GenerateResidentEntryCodeResponse map(GatePass gatePass, Resident resident) {
         GenerateResidentEntryCodeResponse response = new GenerateResidentEntryCodeResponse();
         response.setCode(gatePass.getCode());
-
-
         response.setResidentName(resident.getName());
-
         response.setCodeType(gatePass.getPassType().name());
         response.setValidTill(
                 gatePass.getExpiresAt() != null ? gatePass.getExpiresAt().toString() : "No expiry"
@@ -57,7 +54,6 @@ public class Mapper {
     }
 
     public static Visitor mapVisitor(GenerateVisitorEntryCodeRequest request, String residentId) {
-        // FIX: Visitor was never actually saved before. Now we map and persist it properly.
         Visitor visitor = new Visitor();
         visitor.setName(request.getVisitorName());
         visitor.setPhoneNumber(request.getVisitorPhoneNumber());
@@ -68,22 +64,14 @@ public class Mapper {
 
     public static GatePass mapVisitorGatePass(GenerateVisitorEntryCodeRequest request, String visitorId) {
         GatePass gatePass = new GatePass();
-
-        // FIX: was Integer.parseInt() — residentId is now String
         gatePass.setResidentId(request.getResidentId());
-
-        // FIX: set the actual saved visitor ID on the gate pass
         gatePass.setVisitorId(visitorId);
-
-        // FIX: changed to VISITOR_ENTRY
         gatePass.setPassType(Types.VISITOR_ENTRY);
-
         return gatePass;
     }
 
     public static GenerateVisitorEntryCodeResponse mapToVisitorResponse(
             GatePass gatePass, GenerateVisitorEntryCodeRequest request) {
-
         GenerateVisitorEntryCodeResponse response = new GenerateVisitorEntryCodeResponse();
         response.setCode(gatePass.getCode());
         response.setVisitorName(request.getVisitorName());
@@ -98,7 +86,6 @@ public class Mapper {
         GenerateExitCodeResponse response = new GenerateExitCodeResponse();
         response.setCode(gatePass.getCode());
         response.setPassType(gatePass.getPassType().name());
-
         response.setValidTill(
                 gatePass.getExpiresAt() != null ? gatePass.getExpiresAt().toString() : "No expiry"
         );

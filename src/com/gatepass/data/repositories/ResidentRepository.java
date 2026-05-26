@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface ResidentRepository extends MongoRepository<Resident, String> {
 
     Resident findByPhoneNumber(String phoneNumber);
-
+    Resident findByEmail(String email);
 
 
 }
