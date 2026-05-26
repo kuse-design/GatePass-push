@@ -1,14 +1,14 @@
 package com.gatepass.dtos.request;
 
 import lombok.Data;
+import java.time.LocalDateTime;
 
-import java.time.LocalTime;
 
 @Data
 public class GenerateResidentEntryCodeRequest {
 
     private String residentId;
-    private LocalTime validTill;
+    private LocalDateTime validTill;
     private String phoneNumber;
 
 
