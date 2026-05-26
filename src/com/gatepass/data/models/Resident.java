@@ -13,6 +13,6 @@ public class Resident {
         private String phoneNumber;
         private String houseAddress;
         private String email;
-        private boolean isEnabled;
+        private boolean enabled = true;
 
 }

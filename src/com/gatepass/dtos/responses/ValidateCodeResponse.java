@@ -9,8 +9,8 @@ public class ValidateCodeResponse {
     private String visitorsName;
     private String codeType;
     private String createdBy;
-    private boolean isValid;
-    private String Message;
+    private boolean valid;
+    private String message;
 
 
 }

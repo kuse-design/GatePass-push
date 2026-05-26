@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class GenerateExitCodeRequest {
 
-    private String code;
+//    private String code;
     private LocalDateTime validTill;
 
 

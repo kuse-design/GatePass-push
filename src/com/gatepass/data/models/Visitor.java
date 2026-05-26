@@ -9,10 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Visitor {
 
 
-    private int id;
+    private String id;
     private String name;
     private String purposeOfVisiting;
     private String phoneNumber;
+    private String residentId;
 
 
 }

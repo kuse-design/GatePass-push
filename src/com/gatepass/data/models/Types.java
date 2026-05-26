@@ -1,5 +1,5 @@
 package com.gatepass.data.models;
 
 public enum Types {
-    ENTRY, EXIT
+    RESIDENT_ENTRY, VISITOR_ENTRY, EXIT
 }

@@ -3,8 +3,10 @@ package com.gatepass.services;
 import com.gatepass.data.models.GatePass;
 import com.gatepass.data.models.Resident;
 import com.gatepass.data.models.Types;
+import com.gatepass.data.models.Visitor;
 import com.gatepass.data.repositories.GatePassRepository;
 import com.gatepass.data.repositories.ResidentRepository;
+import com.gatepass.data.repositories.VisitorRepository;
 import com.gatepass.dtos.request.*;
 import com.gatepass.dtos.responses.*;
 import com.gatepass.exceptions.InvalidGatePassException;
@@ -24,15 +26,18 @@ public class GateAccessService {
 
     @Autowired
     private GatePassRepository gatePassRepository;
+    @Autowired
+    private VisitorRepository visitorRepository;
 
     public GateAccessService(ResidentRepository residentRepository,
-                             GatePassRepository gatePassRepository) {
+                             GatePassRepository gatePassRepository,
+                             VisitorRepository visitorRepository) {
         this.residentRepository = residentRepository;
         this.gatePassRepository = gatePassRepository;
+        this.visitorRepository = visitorRepository;
     }
 
     public GenerateExitCodeResponse generateExitCode(GenerateExitCodeRequest request) {
-
         String exitCode = RandomCodeGenerator.generateCode(gatePassRepository);
 
         GatePass gatePass = new GatePass();
@@ -51,19 +56,16 @@ public class GateAccessService {
     public GenerateResidentEntryCodeResponse generateResidentEntryCode(
             GenerateResidentEntryCodeRequest request) {
 
-        GatePass gatePass = Mapper.map(request);
+        Resident resident = residentRepository.findById(request.getResidentId())
+                .orElseThrow(() -> new ResidentDoesNotExistException("Resident not found"));
 
+        GatePass gatePass = Mapper.map(request);
         String code = RandomCodeGenerator.generateCode(gatePassRepository);
         gatePass.setCode(code);
 
         GatePass savedGatePass = gatePassRepository.save(gatePass);
-        Resident resident = residentRepository
-                .findById(String.valueOf(savedGatePass.getResidentId()))
-                .orElseThrow(() -> new ResidentDoesNotExistException("Resident not found"));
 
-        GenerateResidentEntryCodeResponse response =
-                Mapper.map(savedGatePass, resident);
-
+        GenerateResidentEntryCodeResponse response = Mapper.map(savedGatePass, resident);
         response.setMessage("Resident entry code generated");
 
         return response;
@@ -72,16 +74,21 @@ public class GateAccessService {
     public GenerateVisitorEntryCodeResponse generateVisitorEntryCode(
             GenerateVisitorEntryCodeRequest request) {
 
-        GatePass gatePass = Mapper.map(request);
+        residentRepository.findById(request.getResidentId())
+                .orElseThrow(() -> new ResidentDoesNotExistException(
+                        "Resident not found for visitor entry"));
 
+        Visitor visitor = Mapper.mapVisitor(request, request.getResidentId());
+        Visitor savedVisitor = visitorRepository.save(visitor);
+
+        GatePass gatePass = Mapper.mapVisitorGatePass(request, savedVisitor.getId());
         String code = RandomCodeGenerator.generateCode(gatePassRepository);
         gatePass.setCode(code);
 
         GatePass savedGatePass = gatePassRepository.save(gatePass);
 
         GenerateVisitorEntryCodeResponse response =
-                Mapper.mapVisitor(savedGatePass, request);
-
+                Mapper.mapToVisitorResponse(savedGatePass, request);
         response.setMessage("Visitor entry code generated");
 
         return response;
@@ -91,8 +98,10 @@ public class GateAccessService {
         GatePass gatePass = gatePassRepository.findByCode(code);
 
         if (gatePass == null) {
-            return "Code not found";
+            throw new InvalidGatePassException("Code not found");
+
         }
+
 
         gatePass.setActive(false);
         gatePassRepository.save(gatePass);
@@ -101,24 +110,48 @@ public class GateAccessService {
     }
 
     public ValidateCodeResponse validateCode(ValidateCodeRequest request) {
-
         ValidateCodeResponse response = new ValidateCodeResponse();
         GatePass gatePass = gatePassRepository.findByCode(request.getCode());
 
         if (gatePass == null) {
             response.setValid(false);
             response.setMessage("Invalid code");
+            return response;
         }
-        else if (!gatePass.isActive()) {
+
+        if (!gatePass.isActive()) {
             response.setValid(false);
             response.setMessage("Code is disabled");
+            return response;
         }
-        else if (gatePass.getPassType() == Types.ENTRY) {
-            response.setValid(true);
-            response.setMessage("Entry allowed");
+
+        if (gatePass.getExpiresAt() != null && gatePass.getExpiresAt().isBefore(LocalDateTime.now())) {
+            gatePass.setActive(false);
+            gatePassRepository.save(gatePass);
+            response.setValid(false);
+            response.setMessage("Code has expired");
+            return response;
         }
-        else {
-            response.setValid(true);
+
+        response.setCodeType(gatePass.getPassType().name());
+        response.setValid(true);
+
+        if (gatePass.getPassType() == Types.RESIDENT_ENTRY) {
+            residentRepository.findById(gatePass.getResidentId()).ifPresent(resident ->
+                    response.setResidentName(resident.getName())
+            );
+            response.setMessage("Resident entry allowed");
+        } else if (gatePass.getPassType() == Types.VISITOR_ENTRY) {
+            residentRepository.findById(gatePass.getResidentId()).ifPresent(resident ->
+                    response.setCreatedBy(resident.getName())
+            );
+            if (gatePass.getVisitorId() != null) {
+                visitorRepository.findById(gatePass.getVisitorId()).ifPresent(visitor ->
+                        response.setVisitorsName(visitor.getName())
+                );
+            }
+            response.setMessage("Visitor entry allowed");
+        } else {
             response.setMessage("Exit allowed");
         }
 
@@ -126,7 +159,6 @@ public class GateAccessService {
     }
 
     public void extendTime(String code, String newExpiryTime) {
-
         GatePass pass = gatePassRepository.findByCode(code);
 
         if (pass == null) {
