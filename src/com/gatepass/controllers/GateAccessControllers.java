@@ -3,6 +3,8 @@ package com.gatepass.controllers;
 import com.gatepass.dtos.request.*;
 import com.gatepass.dtos.responses.ApiResponse;
 import com.gatepass.services.GateAccessService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +19,17 @@ public class GateAccessControllers {
     private GateAccessService gateAccessService;
 
     @PostMapping("/exit-code")
-    public ResponseEntity<ApiResponse> generateExitCode(@RequestBody GenerateExitCodeRequest request) {
+    public ResponseEntity<ApiResponse> generateExitCode(
+            @Valid @RequestBody GenerateExitCodeRequest request) {
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("Exit code generated", true,
-                            gateAccessService.generateExitCode(request)));
+                    .body(new ApiResponse(
+                            "Exit code generated",
+                            true,
+                            gateAccessService.generateExitCode(request)
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));
@@ -30,11 +38,16 @@ public class GateAccessControllers {
 
     @PostMapping("/resident-entry-code")
     public ResponseEntity<ApiResponse> generateResidentEntryCode(
-            @RequestBody GenerateResidentEntryCodeRequest request) {
+            @Valid @RequestBody GenerateResidentEntryCodeRequest request) {
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("Resident entry code generated", true,
-                            gateAccessService.generateResidentEntryCode(request)));
+                    .body(new ApiResponse(
+                            "Resident entry code generated",
+                            true,
+                            gateAccessService.generateResidentEntryCode(request)
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));
@@ -43,11 +56,16 @@ public class GateAccessControllers {
 
     @PostMapping("/visitor-entry-code")
     public ResponseEntity<ApiResponse> generateVisitorEntryCode(
-            @RequestBody GenerateVisitorEntryCodeRequest request) {
+            @Valid @RequestBody GenerateVisitorEntryCodeRequest request) {
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("Visitor entry code generated", true,
-                            gateAccessService.generateVisitorEntryCode(request)));
+                    .body(new ApiResponse(
+                            "Visitor entry code generated",
+                            true,
+                            gateAccessService.generateVisitorEntryCode(request)
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));
@@ -55,11 +73,17 @@ public class GateAccessControllers {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<ApiResponse> validateCode(@RequestBody ValidateCodeRequest request) {
+    public ResponseEntity<ApiResponse> validateCode(
+            @Valid @RequestBody ValidateCodeRequest request) {
+
         try {
             return ResponseEntity.ok(
-                    new ApiResponse("Code validated", true,
-                            gateAccessService.validateCode(request)));
+                    new ApiResponse(
+                            "Code validated",
+                            true,
+                            gateAccessService.validateCode(request)
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));
@@ -67,10 +91,17 @@ public class GateAccessControllers {
     }
 
     @PatchMapping("/{code}/disable")
-    public ResponseEntity<ApiResponse> disableCode(@PathVariable String code) {
+    public ResponseEntity<ApiResponse> disableCode(
+            @PathVariable String code) {
+
         try {
             return ResponseEntity.ok(
-                    new ApiResponse(gateAccessService.disableCode(code), true, null));
+                    new ApiResponse(
+                            gateAccessService.disableCode(code),
+                            true,
+                            null
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));
@@ -80,11 +111,21 @@ public class GateAccessControllers {
     @PatchMapping("/{code}/extend")
     public ResponseEntity<ApiResponse> extendCode(
             @PathVariable String code,
-            @RequestParam String newExpiryTime) {
+
+            @RequestParam
+            @NotBlank(message = "New expiry time is required")
+            String newExpiryTime) {
+
         try {
             gateAccessService.extendTime(code, newExpiryTime);
+
             return ResponseEntity.ok(
-                    new ApiResponse("Code expiry extended", true, null));
+                    new ApiResponse(
+                            "Code expiry extended",
+                            true,
+                            null
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));

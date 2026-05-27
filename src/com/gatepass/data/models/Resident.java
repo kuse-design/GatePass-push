@@ -15,6 +15,7 @@ public class Resident {
         private String phoneNumber;
         private String houseAddress;
         private String email;
+        private String residentCode;
         private LocalDateTime dateRegistered = LocalDateTime.now();
         private boolean enabled = true;
 

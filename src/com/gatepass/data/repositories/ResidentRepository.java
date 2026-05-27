@@ -9,6 +9,8 @@ public interface ResidentRepository extends MongoRepository<Resident, String> {
 
     Resident findByPhoneNumber(String phoneNumber);
     Resident findByEmail(String email);
+    Resident findByResidentCode(String residentCode);
+    long count();
 
 
 }

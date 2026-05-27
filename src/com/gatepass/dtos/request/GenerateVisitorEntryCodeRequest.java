@@ -6,7 +6,7 @@ import lombok.Data;
 
 public class GenerateVisitorEntryCodeRequest {
 
-    private String residentId;
+    private String residentCode;
     private String visitorPhoneNumber;
     private String purposeOfVisit;
     private String visitorName;

@@ -7,8 +7,6 @@ import com.gatepass.data.models.Visitor;
 import com.gatepass.dtos.request.*;
 import com.gatepass.dtos.responses.*;
 
-import java.time.LocalDateTime;
-
 public class Mapper {
 
     public static Resident map(OnboardResidentRequest request) {
@@ -17,12 +15,14 @@ public class Mapper {
         resident.setPhoneNumber(request.getPhoneNumber());
         resident.setHouseAddress(request.getAddress());
         resident.setEmail(request.getEmail());
+
         return resident;
     }
 
     public static OnboardResidentResponse map(Resident resident) {
         OnboardResidentResponse response = new OnboardResidentResponse();
         response.setResidentId(resident.getId());
+        response.setResidentCode(resident.getResidentCode());
         response.setResidentName(resident.getName());
         response.setPhoneNumber(resident.getPhoneNumber());
         response.setHouseAddress(resident.getHouseAddress());
@@ -34,11 +34,11 @@ public class Mapper {
         return response;
     }
 
-    public static GatePass map(GenerateResidentEntryCodeRequest request) {
+    public static GatePass mapResidentGatePass(GenerateResidentEntryCodeRequest request, Resident resident) {
         GatePass gatePass = new GatePass();
-        gatePass.setResidentId(request.getResidentId());
+        gatePass.setResidentId(resident.getId());
         gatePass.setPassType(Types.RESIDENT_ENTRY);
-        gatePass.setExpiresAt(LocalDateTime.from(request.getValidTill()));
+        gatePass.setExpiresAt(request.getValidTill());
         return gatePass;
     }
 
@@ -62,9 +62,9 @@ public class Mapper {
         return visitor;
     }
 
-    public static GatePass mapVisitorGatePass(GenerateVisitorEntryCodeRequest request, String visitorId) {
+    public static GatePass mapVisitorGatePass(GenerateVisitorEntryCodeRequest request, String visitorId, Resident resident) {
         GatePass gatePass = new GatePass();
-        gatePass.setResidentId(request.getResidentId());
+        gatePass.setResidentId(resident.getId());
         gatePass.setVisitorId(visitorId);
         gatePass.setPassType(Types.VISITOR_ENTRY);
         return gatePass;

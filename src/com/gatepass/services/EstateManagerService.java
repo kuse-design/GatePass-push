@@ -10,7 +10,6 @@ import com.gatepass.dtos.responses.EstateManagerResponse;
 import com.gatepass.exceptions.InvalidGatePassException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service

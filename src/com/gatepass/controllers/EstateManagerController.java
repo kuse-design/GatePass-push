@@ -4,6 +4,7 @@ import com.gatepass.dtos.request.EstateManagerRequest;
 import com.gatepass.dtos.request.EstateManagerRequest;
 import com.gatepass.dtos.responses.ApiResponse;
 import com.gatepass.services.EstateManagerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,18 @@ public class EstateManagerController {
     @Autowired
     private EstateManagerService estateManagerService;
 
-
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addManager(@RequestBody EstateManagerRequest request) {
+    public ResponseEntity<ApiResponse> addManager(
+            @Valid @RequestBody EstateManagerRequest request) {
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("Manager added successfully", true,
-                            estateManagerService.addManager(request)));
+                    .body(new ApiResponse(
+                            "Manager added successfully",
+                            true,
+                            estateManagerService.addManager(request)
+                    ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(e.getMessage(), false, null));

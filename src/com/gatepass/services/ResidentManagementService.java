@@ -8,8 +8,10 @@ import com.gatepass.dtos.responses.OnboardResidentResponse;
 import com.gatepass.exceptions.ResidentAlreadyRegisteredException;
 import com.gatepass.exceptions.ResidentDoesNotExistException;
 import com.gatepass.utils.Mapper;
+import com.gatepass.utils.ResidentCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -19,7 +21,6 @@ public class ResidentManagementService {
     private ResidentRepository residentRepository;
 
     public OnboardResidentResponse onboardResident(OnboardResidentRequest request) {
-
         Resident existingByPhone = residentRepository.findByPhoneNumber(request.getPhoneNumber());
         if (existingByPhone != null)
             throw new ResidentAlreadyRegisteredException("A resident with this phone number already exists");
@@ -29,17 +30,18 @@ public class ResidentManagementService {
             throw new ResidentAlreadyRegisteredException("A resident with this email already exists");
 
         Resident resident = Mapper.map(request);
-        residentRepository.save(resident);
 
+        String residentCode = ResidentCodeGenerator.generate(residentRepository);
+        resident.setResidentCode(residentCode);
+
+        residentRepository.save(resident);
         return Mapper.map(resident);
     }
 
     public String deleteResident(String phoneNumber) {
         Resident resident = residentRepository.findByPhoneNumber(phoneNumber);
-
         if (resident == null)
             throw new ResidentDoesNotExistException("Resident not available");
-
         residentRepository.delete(resident);
         return "Resident deleted successfully";
     }
@@ -50,13 +52,10 @@ public class ResidentManagementService {
 
     public String disableResident(String phoneNumber) {
         Resident resident = residentRepository.findByPhoneNumber(phoneNumber);
-
         if (resident == null)
             throw new ResidentDoesNotExistException("Resident unavailable");
-
         resident.setEnabled(false);
         residentRepository.save(resident);
-
         return resident.getName() + " disabled";
     }
 }
